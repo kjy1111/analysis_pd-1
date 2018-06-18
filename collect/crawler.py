@@ -1,8 +1,5 @@
-import os
 import json
 from .api import api
-
-RESULT_DIRECTORY = '__results__/crawling'
 
 
 def preprocess_tourspot_visitor(item):
@@ -85,9 +82,11 @@ def crawling_tourspot_visitor(
         district,
         start_year,
         end_year,
-        fetch=True):
+        fetch=True,
+        result_directory='',
+        service_key=''):
     results = []
-    filename = '%s/%s_tourspot_%s_%s.json' % (RESULT_DIRECTORY, district, start_year, end_year)
+    filename = '%s/%s_tourspot_%s_%s.json' % (result_directory, district, start_year, end_year)
 
     if fetch:
         for year in range(start_year, end_year+1):
@@ -95,7 +94,8 @@ def crawling_tourspot_visitor(
                 for items in api.pd_fetch_tourspot_visitor(
                         district1=district,
                         year=year,
-                        month=month):
+                        month=month,
+                        service_key=service_key):
                     for item in items:
                         preprocess_tourspot_visitor(item)
 
@@ -109,24 +109,31 @@ def crawling_tourspot_visitor(
     return filename
 
 
-def crawling_foreign_visitor(country, start_year, end_year):
+def crawling_foreign_visitor(
+        country,
+        start_year,
+        end_year,
+        fetch=True,
+        result_directory='',
+        service_key=''):
     results = []
 
-    for year in range(start_year, end_year+1):
-        for month in range(1, 13):
-            data = api.pd_fetch_foreign_visitor(country[1], year, month)
-            if data is None:
-                continue
+    if fetch:
+        for year in range(start_year, end_year+1):
+            for month in range(1, 13):
+                data = api.pd_fetch_foreign_visitor(
+                    country[1],
+                    year,
+                    month,
+                    service_key)
+                if data is None:
+                    continue
 
-            preprocess_foreign_visitor(data)
-            results.append(data)
+                preprocess_foreign_visitor(data)
+                results.append(data)
 
-    # save data to file
-    filename = '%s/%s(%s)_foreignvisitor_%s_%s.json' % (RESULT_DIRECTORY, country[0], country[1], start_year, end_year)
-    with open(filename, 'w', encoding='utf-8') as outfile:
-        json_string = json.dumps(results, indent=4, sort_keys=True, ensure_ascii=False)
-        outfile.write(json_string)
-
-
-if not os.path.exists(RESULT_DIRECTORY):
-    os.makedirs(RESULT_DIRECTORY)
+        # save data to file
+        filename = '%s/%s(%s)_foreignvisitor_%s_%s.json' % (result_directory, country[0], country[1], start_year, end_year)
+        with open(filename, 'w', encoding='utf-8') as outfile:
+            json_string = json.dumps(results, indent=4, sort_keys=True, ensure_ascii=False)
+            outfile.write(json_string)
