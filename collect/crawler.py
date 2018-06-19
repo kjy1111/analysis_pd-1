@@ -116,7 +116,9 @@ def crawling_foreign_visitor(
         fetch=True,
         result_directory='',
         service_key=''):
+
     results = []
+    filename = '%s/%s(%s)_foreignvisitor_%s_%s.json' % (result_directory, country[0], country[1], start_year, end_year)
 
     if fetch:
         for year in range(start_year, end_year+1):
@@ -133,7 +135,8 @@ def crawling_foreign_visitor(
                 results.append(data)
 
         # save data to file
-        filename = '%s/%s(%s)_foreignvisitor_%s_%s.json' % (result_directory, country[0], country[1], start_year, end_year)
         with open(filename, 'w', encoding='utf-8') as outfile:
             json_string = json.dumps(results, indent=4, sort_keys=True, ensure_ascii=False)
             outfile.write(json_string)
+
+    return filename
