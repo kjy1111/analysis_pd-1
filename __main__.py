@@ -2,6 +2,9 @@ import collect
 import analyze
 import visualize
 from config import CONFIG
+import pandas as pd
+import matplotlib.pyplot as plt
+
 
 if __name__ == '__main__':
     resultfiles = dict()
@@ -22,7 +25,8 @@ if __name__ == '__main__':
 
     # 2. analysis and visualize
     result_analysis = analyze.analysis_correlation_by_tourspot(resultfiles)
-    graph_table = pd.DataFrame(result_analysis, colums=['tourspot', 'r_중국', 'r_일본', 'r_미국'])
+
+    graph_table = pd.DataFrame(result_analysis, columns=['tourspot', 'r_중국', 'r_일본', 'r_미국'])
     graph_table = graph_table.set_index('tourspot')
 
     graph_table.plot(kind='bar')
